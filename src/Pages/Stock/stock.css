@@ -1,0 +1,52 @@
+.container-stock {
+  margin: 0px 6px 0px 137px;
+}
+.button-add-new-item {
+  background: green;
+  padding: 16px 18px;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+  border-radius: 12px;
+  font-weight: 550;
+}
+.wrapper-search-bar {
+  background: white;
+  padding: 24px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.button-popUp-stock {
+  border: none;
+  padding: 8px 12px;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.flex-center-stock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.button-kirim-belanja {
+  background: red;
+  color: white;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.input-belanja-text {
+  border-radius: 4px;
+  padding: 4px;
+  outline: none;
+}
+.reset-button {
+  padding: 8px 10px;
+  cursor: pointer;
+  background: #79c9c5;
+  border: none;
+  color: white;
+  border-radius: 4px;
+}

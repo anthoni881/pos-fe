@@ -1,0 +1,54 @@
+.container-header-print {
+  width: 100%;
+  font-size: 6px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 0.2px solid lightgray;
+  font-weight: 500;
+}
+.container-data-print {
+  width: 100%;
+  font-size: 5px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 0.5px dotted lightgray;
+}
+.no-element {
+  width: 8%;
+  max-width: 8%;
+  min-width: 8%;
+  margin-bottom: 0;
+}
+.name-element {
+  width: 30%;
+  max-width: 30%;
+  min-width: 30%;
+  flex-wrap: wrap;
+  margin-bottom: 0;
+}
+.harga-element {
+  width: 25%;
+  max-width: 25%;
+  min-width: 25%;
+  margin-bottom: 0;
+}
+.qty-element {
+  width: 10%;
+  max-width: 10%;
+  min-width: 10%;
+  text-align: center;
+  margin-bottom: 0;
+}
+.total-element {
+  width: 27%;
+  max-width: 27%;
+  min-width: 27%;
+  margin-bottom: 0;
+  text-align: right;
+}
+.wrapper-footer-print {
+  width: 150px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 5px;
+}

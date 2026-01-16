@@ -1,0 +1,102 @@
+.container_login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.wrapper_logo_tim_login {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  top: 45%;
+  left: 16vw;
+  z-index: 1;
+  max-width: 30vw;
+}
+.wrapper_card_left_login {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  height: 100%;
+  opacity: 0.5;
+}
+.card_left_login {
+  height: 80%;
+  background: #f4f4f4;
+  width: 90%;
+  border-radius: 8px 0 0 8px;
+  z-index: -1;
+  box-shadow: -6px 6px 16px -2px rgb(0 0 0 / 20%);
+  display: flex;
+  justify-content: center;
+}
+.wrapper_card_right {
+  background: #fefeff;
+  width: 50%;
+  height: 100vh;
+}
+.card_login_right {
+  height: 80%;
+  background: #f4f4f4;
+  width: 90%;
+  border-radius: 0 8px 8px 0;
+  box-shadow: 6px 6px 16px 2px rgb(0 0 0 / 20%);
+  display: flex;
+  justify-content: center;
+}
+.input_username_password {
+  height: 32px;
+  margin-bottom: 12px;
+  border: 1px solid lightgray;
+  border-radius: 4px;
+  padding: 0 6px;
+}
+.button_signin {
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  color: white;
+  background: #eb853e;
+  cursor: pointer;
+}
+.wrapper-input-signin {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 40%;
+  height: 90%;
+}
+.wrapper_button_salah_popup {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+.button_popup_login {
+  padding: 8px 16px;
+  background-color: red;
+  cursor: pointer;
+  border: none;
+  color: white;
+  border-radius: 6px;
+}
+
+@media only screen and (max-width: 600px) {
+  .display-none-mobile {
+    display: none;
+  }
+  .wrapper_card_right {
+    width: 100%;
+  }
+  .card_login_right {
+    height: 100%;
+    background: #f4f4f4;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .wrapper-input-signin {
+    width: 70%;
+    height: 90%;
+  }
+}
