@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import PopUpComponent from "../../Components/PopUp/PopUpComponent";
 import MenuComponent from "../../Components/MenuComponent/MenuComponent";
 import { formatDot } from "../../util/helperFunction";
@@ -49,9 +49,52 @@ const Kasir = () => {
     handleChangeFinalisasi,
     setIsReload,
     componentRef,
+    result,
+    setResult,
+    listStok,
+    setKeranjang,
   } = useKasir();
 
   const [menu, setMenu] = useState("kasir");
+  const bufferRef = useRef("");
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+  useEffect(() => {
+    let obj = [...keranjang];
+
+    const findIndex = obj && obj.findIndex((obj) => obj.kode === result);
+    const foundObject = obj && obj.find((obj) => obj.kode === result);
+
+    const data = listStok && listStok.find((obj) => obj.kode === result);
+
+    if (result !== "") {
+      if (findIndex === -1) {
+        obj.push({
+          id: data && data.id,
+          userId: dataUser.id,
+          isFinal: false,
+          name: data && data.name,
+          kode: data && data.kode,
+          qty: 1,
+          price: data && data.price,
+          toko: data && data.toko,
+        });
+        setResult("");
+        console.log("hola1");
+
+        setKeranjang(obj);
+      } else {
+        let calculate = foundObject.qty + 1;
+        obj[findIndex][`qty`] = calculate;
+        setKeranjang(obj);
+        setResult("");
+        console.log("hola2");
+      }
+    }
+  }, [result]);
 
   const sumItem =
     keranjang &&
@@ -72,8 +115,26 @@ const Kasir = () => {
       return s + sumPrice;
     }, 0);
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      if (bufferRef.current) {
+        setResult(bufferRef.current);
+        bufferRef.current = "";
+      }
+    } else if (e.key.length === 1) {
+      bufferRef.current += e.key;
+    }
+  };
+
   return (
     <>
+      <input
+        id="myInput"
+        ref={inputRef}
+        style={{ position: "absolute", opacity: 0, height: 0 }}
+        autoFocus
+        onKeyDown={handleKeyDown}
+      />
       <div
         style={{ visibility: "hidden", top: "-9999px", position: "absolute" }}
       >
@@ -196,7 +257,7 @@ const Kasir = () => {
                     </button>
                   </div>
                 </div>
-                <div className="wrapper-table-kasir">
+                <div className="wrapper-table-kasir" style={{ height: "70vh" }}>
                   <table
                     className="font10-mobile-bpb"
                     style={{ width: "100%", borderSpacing: 0 }}
@@ -427,7 +488,7 @@ const Kasir = () => {
                   return (
                     <div
                       style={{
-                        borderBottom: "1px dashed lightgray",
+                        borderBottom: "1px dashed darkblue",
                         padding: "12px 0",
                       }}
                     >

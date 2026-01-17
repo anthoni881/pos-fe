@@ -30,6 +30,8 @@ export const useKasir = () => {
 
   const [pecahanUang, setPecahanUang] = useState();
 
+  const [result, setResult] = useState("");
+
   useEffect(() => {
     document.addEventListener("keydown", detectKeyDown, true);
   }, []);
@@ -51,8 +53,16 @@ export const useKasir = () => {
     onBeforePrint: handleBeforePrint,
   });
   const detectKeyDown = (e) => {
-    if (e.key === "F1") {
+    if (e.key === "F2") {
       printFn();
+    }
+    if (e.key === "F4") {
+      e.preventDefault();
+      setTimeout(() => {
+        const input = document.getElementById("myInput");
+        input.focus();
+        input.select();
+      }, 10); // delay 10ms
     }
   };
 
@@ -266,5 +276,9 @@ export const useKasir = () => {
     handleChangeFinalisasi,
     setIsReload,
     componentRef,
+    result,
+    setResult,
+    listStok,
+    setKeranjang,
   };
 };
