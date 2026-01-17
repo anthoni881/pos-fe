@@ -22,6 +22,7 @@ export const useLogin = () => {
           navigate("/kasir");
           setPopUpLogin(false);
         } else {
+          navigate("/kasir");
           setPopUpLogin(true);
           setErrMsg(data.message);
         }

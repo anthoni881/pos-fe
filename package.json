@@ -20,6 +20,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "deploy": "lc-static",
     "start": "cp ./src/environment/staging.env .env && react-scripts start",
     "local": "cp ./src/environment/local.env .env && react-scripts start",
     "build": "react-scripts build",

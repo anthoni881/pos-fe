@@ -1,17 +1,20 @@
+.relativeCSS {
+  font-family: monospace, Courier, "Lucida Console";
+}
 .container-header-print {
   width: 100%;
-  font-size: 6px;
+  font-size: 16x;
   display: flex;
   justify-content: space-between;
-  border-bottom: 0.2px solid lightgray;
+  border-bottom: 0.2px solid darkblue;
   font-weight: 500;
 }
 .container-data-print {
   width: 100%;
-  font-size: 5px;
+  font-size: 14px;
   display: flex;
   justify-content: space-between;
-  border-bottom: 0.5px dotted lightgray;
+  border-bottom: 0.5px dotted darkblue;
 }
 .no-element {
   width: 8%;
@@ -47,8 +50,8 @@
   text-align: right;
 }
 .wrapper-footer-print {
-  width: 150px;
+  width: 75mm;
   display: flex;
   justify-content: space-between;
-  font-size: 5px;
+  font-size: 14px;
 }

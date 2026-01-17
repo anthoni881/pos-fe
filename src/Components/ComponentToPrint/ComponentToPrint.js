@@ -23,8 +23,6 @@ export const ComponentToPrint = forwardRef((props, ref) => {
     }
   }, []);
 
-  let widthPrint = 150;
-
   useEffect(() => {
     let height = document.getElementById("testClass")?.offsetHeight;
     setCheckHeight(height);
@@ -33,28 +31,26 @@ export const ComponentToPrint = forwardRef((props, ref) => {
   return (
     <>
       <style type="text/css" media="print">
-        {`@page { size: ${widthPrint}px ${checkHeight + 0}px; }`}
+        {`@page { size: 75mm 50mm portrait;`}
       </style>
       <div ref={ref} className="relativeCSS" id="testClass">
         <link href="./as-style.css" rel="stylesheet" />
         <div className="flash" />
 
-        <div style={{ width: "150px", padding: "4px" }}>
+        <div style={{ width: "75mm", padding: "4px", color: "darkblue" }}>
           <div>
             <p
               style={{
-                fontSize: "6px",
-                margin: "2px 0",
+                fontSize: "16px",
                 fontWeight: "500",
-                textDecoration: "underline",
+                lineHeight: "16px",
+                width: "fit-content",
               }}
             >
               Tiga Harga | Tenar
             </p>
-            <p style={{ fontSize: "6px", margin: "2px 0" }}>Kasir : {kasir}</p>
-            <p style={{ fontSize: "6px", margin: "2px 0" }}>
-              Tanggal : {tanggal}
-            </p>
+            <p style={{ fontSize: "16px" }}>Kasir : {kasir}</p>
+            <p style={{ fontSize: "16px" }}>Tanggal : {tanggal}</p>
           </div>
           <div className="container-header-print">
             <p className="no-element">No.</p>
@@ -114,14 +110,14 @@ export const ComponentToPrint = forwardRef((props, ref) => {
 
           <div className="wrapper-footer-print">
             <p
-              style={{ lineHeight: "8px", margin: "2px 0", fontWeight: "500" }}
+              style={{ lineHeight: "16px", margin: "2px 0", fontWeight: "500" }}
             >
               Total :
             </p>
             <p
               style={{
-                borderBottom: "0.5px solid black",
-                lineHeight: "8px",
+                borderBottom: "0.5px solid darkblue",
+                lineHeight: "16px",
                 margin: "2px 0",
                 fontWeight: "500",
               }}
