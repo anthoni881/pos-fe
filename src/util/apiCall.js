@@ -27,10 +27,12 @@ export const postAxios = async (
       {
         setDataPost === "" ? nothing() : handlePostTrue();
       }
+      setErrMsgPost("");
     } else {
-      {
-        setErrMsgPost === "" ? nothing() : setErrMsgPost(data);
-      }
+      setErrMsgPost(data);
+      // {
+      //   setErrMsgPost === "" ? nothing() : setErrMsgPost(data);
+      // }
     }
   } catch (error) {
     console.log(error);

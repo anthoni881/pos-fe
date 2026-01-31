@@ -53,15 +53,55 @@ const Kasir = () => {
     setResult,
     listStok,
     setKeranjang,
+    lastOrder,
+    printFn,
+    uniqueArray,
+    filterKasir,
+    setFilterKasir,
+    dataFinalisasiTransaksi,
   } = useKasir();
 
   const [menu, setMenu] = useState("kasir");
+  const [visibleProdukCount, setVisibleProdukCount] = useState(30);
+  const [isLoadingMoreProduk, setIsLoadingMoreProduk] = useState(false);
+  const loadMoreProdukTimeoutRef = useRef(null);
+  const produkTableWrapperRef = useRef(null);
   const bufferRef = useRef("");
   const inputRef = useRef(null);
 
   useEffect(() => {
+    setVisibleProdukCount(30);
+    setIsLoadingMoreProduk(false);
+    if (loadMoreProdukTimeoutRef.current) {
+      clearTimeout(loadMoreProdukTimeoutRef.current);
+      loadMoreProdukTimeoutRef.current = null;
+    }
+  }, [filterSearch, dataTemp?.length]);
+
+  useEffect(() => {
+    return () => {
+      if (loadMoreProdukTimeoutRef.current) {
+        clearTimeout(loadMoreProdukTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const el = produkTableWrapperRef.current;
+    if (!el) return;
+    if (!dataTemp || dataTemp.length === 0) return;
+    if (visibleProdukCount >= dataTemp.length) return;
+
+    const isScrollable = el.scrollHeight > el.clientHeight + 1;
+    if (isScrollable) return;
+
+    setVisibleProdukCount((prev) => Math.min(prev + 30, dataTemp.length));
+  }, [dataTemp?.length, visibleProdukCount]);
+
+  useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
   useEffect(() => {
     let obj = [...keranjang];
 
@@ -83,7 +123,6 @@ const Kasir = () => {
           toko: data && data.toko,
         });
         setResult("");
-        console.log("hola1");
 
         setKeranjang(obj);
       } else {
@@ -91,7 +130,6 @@ const Kasir = () => {
         obj[findIndex][`qty`] = calculate;
         setKeranjang(obj);
         setResult("");
-        console.log("hola2");
       }
     }
   }, [result]);
@@ -101,6 +139,7 @@ const Kasir = () => {
     keranjang.reduce(function (s, a) {
       return s + a.qty;
     }, 0);
+
   const sumTotal =
     keranjang &&
     keranjang.reduce(function (s, a) {
@@ -147,6 +186,20 @@ const Kasir = () => {
           tanggal={moment().utcOffset("+0700").format("DD-MM-YYYY, HH:mm:ss")}
         />
       </div>
+      <div
+        style={{ visibility: "hidden", top: "-9999px", position: "absolute" }}
+      >
+        <ComponentToPrint
+          ref={componentRef}
+          total={lastOrder && lastOrder.total}
+          pecahanUang={lastOrder && lastOrder.pecahanUang}
+          kasir={lastOrder && lastOrder.kasir}
+          data={lastOrder && lastOrder.data}
+          tanggal={moment(lastOrder && lastOrder.timestamp)
+            .utcOffset("+0700")
+            .format("DD-MM-YYYY, HH:mm:ss")}
+        />
+      </div>
       <MenuComponent setMenu={setMenu} menu={menu} />
       {popUpFinalisasi ? (
         <PopUpComponent>
@@ -189,7 +242,7 @@ const Kasir = () => {
         ""
       )}
       <div className="container_kasir" style={{ display: "flex" }}>
-        <div style={{ width: "75%", height: "100vh", background: "#fafafa" }}>
+        <div className="wrapper-kasir">
           {dataUser.role === "god_mode" ? (
             <div className="wrapper-sub-menu-kasir">
               <p
@@ -235,6 +288,18 @@ const Kasir = () => {
                   </label>
                 </div>
               </div>
+
+              <div
+                style={{ display: "flex", flexWrap: "wrap", padding: "0 12px" }}
+              >
+                <label style={{ marginRight: "18px", color: "blue" }}>
+                  <b>F2</b> : Kirim & Print
+                </label>
+                <label style={{ color: "blue" }}>
+                  <b>F4</b> : Scan Barcode
+                </label>
+              </div>
+
               <div>
                 <div
                   style={{ display: "flex", justifyContent: "space-between" }}
@@ -251,13 +316,45 @@ const Kasir = () => {
                   >
                     <button
                       className="button-finalisasi"
+                      style={{ background: "green", marginRight: "6px" }}
+                      onClick={() => printFn()}
+                    >
+                      Print Sebelumnya
+                    </button>
+                    <button
+                      className="button-finalisasi"
                       onClick={() => setPopUpFinalisasi(true)}
                     >
                       Finalisasi
                     </button>
                   </div>
                 </div>
-                <div className="wrapper-table-kasir" style={{ height: "70vh" }}>
+                <div
+                  className="wrapper-table-kasir"
+                  ref={produkTableWrapperRef}
+                  style={{ height: "70vh" }}
+                  onScroll={(e) => {
+                    const el = e.currentTarget;
+                    const isScrollable = el.scrollHeight > el.clientHeight + 1;
+                    const isNearBottom =
+                      el.scrollHeight - (el.scrollTop + el.clientHeight) < 200;
+
+                    if (!isScrollable) return;
+                    if (!isNearBottom) return;
+                    if (!dataTemp || dataTemp.length === 0) return;
+                    if (visibleProdukCount >= dataTemp.length) return;
+                    if (isLoadingMoreProduk) return;
+
+                    setIsLoadingMoreProduk(true);
+                    loadMoreProdukTimeoutRef.current = setTimeout(() => {
+                      setVisibleProdukCount((prev) =>
+                        Math.min(prev + 30, dataTemp.length)
+                      );
+                      setIsLoadingMoreProduk(false);
+                      loadMoreProdukTimeoutRef.current = null;
+                    }, 120);
+                  }}
+                >
                   <table
                     className="font10-mobile-bpb"
                     style={{ width: "100%", borderSpacing: 0 }}
@@ -266,50 +363,55 @@ const Kasir = () => {
                       <th style={{ padding: "12px 0 12px 12px" }}>No.</th>
                       <th style={{ padding: "12px 0 12px 12px" }}>Produk</th>
                       <th style={{ padding: "12px 0 12px 12px" }}>Kode</th>
-                      {/* <th style={{ padding: "12px 0 12px 12px" }}>Stok</th> */}
                       <th style={{ padding: "12px 0 12px 12px" }}>Harga</th>
                       <th style={{ padding: "12px 0 12px 12px" }}></th>
                     </tr>
                     {dataTemp &&
-                      dataTemp.map((ele, index) => {
-                        return (
-                          <tr
-                            style={
-                              index % 2 === 0
-                                ? { background: "white" }
-                                : { background: "#F7F7F7" }
-                            }
-                          >
-                            <td
-                              style={{
-                                padding: "12px 0px 12px 12px",
-                              }}
+                      dataTemp
+                        .slice(0, visibleProdukCount)
+                        .map((ele, index) => {
+                          return (
+                            <tr
+                              key={ele?.id ?? ele?.kode ?? index}
+                              style={
+                                index % 2 === 0
+                                  ? { background: "white" }
+                                  : { background: "#F7F7F7" }
+                              }
                             >
-                              {index + 1}.
-                            </td>
-                            <td style={{ padding: "12px 0px 12px 12px" }}>
-                              {ele.name}
-                            </td>
-                            <td style={{ padding: "12px 0px 12px 12px" }}>
-                              {ele.kode}
-                            </td>
-                            {/* <td style={{ padding: "12px 0px 12px 12px" }}>
-                              {formatDot(ele.stock)} Pcs
-                            </td> */}
-                            <td style={{ padding: "12px 0px 12px 12px" }}>
-                              Rp. {formatDot(ele.price)}
-                            </td>
-                            <td style={{ padding: "12px 0px 12px 12px" }}>
-                              <label
-                                className="button-tambah-item"
-                                onClick={() => handleTambahItem(ele)}
-                              >
-                                Tambah
-                              </label>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                              <td className="padding-riwayat">{index + 1}.</td>
+                              <td className="padding-riwayat">{ele.name}</td>
+                              <td className="padding-riwayat">{ele.kode}</td>
+                              <td className="padding-riwayat">
+                                Rp. {formatDot(ele.price)}
+                              </td>
+                              <td className="padding-riwayat">
+                                <label
+                                  className="button-tambah-item"
+                                  onClick={() => handleTambahItem(ele)}
+                                >
+                                  Tambah
+                                </label>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    {dataTemp && dataTemp.length > visibleProdukCount && (
+                      <tr>
+                        <td
+                          colSpan={5}
+                          style={{
+                            padding: "12px",
+                            textAlign: "center",
+                            color: "#666",
+                          }}
+                        >
+                          {isLoadingMoreProduk
+                            ? "Loading..."
+                            : "Scroll untuk load lebih banyak"}
+                        </td>
+                      </tr>
+                    )}
                   </table>
                 </div>
               </div>
@@ -328,11 +430,24 @@ const Kasir = () => {
               </div>
               <div style={{ margin: "0 12px 12px 12px" }}>
                 <input
-                  style={{ height: "24px" }}
+                  style={{ height: "24px", marginRight: "12px" }}
                   type="date"
                   value={filterDateRiwayat}
                   onChange={(e) => setFilterDateRiwayat(e.target.value)}
                 />
+                <select
+                  style={{ padding: "5px" }}
+                  value={filterKasir && filterKasir}
+                  onChange={(e) => setFilterKasir(e.target.value)}
+                >
+                  <option selected disabled>
+                    Pilih Kasir
+                  </option>
+                  {uniqueArray &&
+                    uniqueArray.map((data) => (
+                      <option value={data.id}>{data.kasir}</option>
+                    ))}
+                </select>
               </div>
               <div className="wrapper-table-kasir">
                 <table
@@ -346,7 +461,6 @@ const Kasir = () => {
                     <th style={{ padding: "12px 0 12px 12px" }}>Qty</th>
                     <th style={{ padding: "12px 0 12px 12px" }}>Harga</th>
                     <th style={{ padding: "12px 0 12px 12px" }}>Total</th>
-                    {/* <th style={{ padding: "12px 0 12px 12px" }}>Alat</th> */}
                     <th style={{ padding: "12px 0 12px 12px" }}>Jam</th>
                     <th style={{ padding: "12px 0 12px 12px" }}>Kasir</th>
                   </tr>
@@ -364,37 +478,22 @@ const Kasir = () => {
                               : { background: "#F7F7F7" }
                           }
                         >
-                          <td
-                            style={{
-                              padding: "12px 0px 12px 12px",
-                            }}
-                          >
-                            {index + 1}.
-                          </td>
-                          <td style={{ padding: "12px 0px 12px 12px" }}>
-                            {ele.name}
-                          </td>
-                          <td style={{ padding: "12px 0px 12px 12px" }}>
-                            {ele.kode}
-                          </td>
-                          <td style={{ padding: "12px 0px 12px 12px" }}>
+                          <td className="padding-riwayat">{index + 1}.</td>
+                          <td className="padding-riwayat">{ele.name}</td>
+                          <td className="padding-riwayat">{ele.kode}</td>
+                          <td className="padding-riwayat">
                             {formatDot(ele.qty)} Pcs
                           </td>
-                          <td style={{ padding: "12px 0px 12px 12px" }}>
+                          <td className="padding-riwayat">
                             Rp. {formatDot(ele.price)}
                           </td>
-                          <td style={{ padding: "12px 0px 12px 12px" }}>
+                          <td className="padding-riwayat">
                             Rp. {formatDot(ele.price * ele.qty)}
                           </td>
-                          {/* <td style={{ padding: "12px 0px 12px 12px" }}>
-                            {ele.jenisPembayaran}
-                          </td> */}
-                          <td style={{ padding: "12px 0px 12px 12px" }}>
+                          <td className="padding-riwayat">
                             {moment(ele.timestamp).format("HH:mm:ss")}
                           </td>
-                          <td style={{ padding: "12px 0px 12px 12px" }}>
-                            {ele.kasir}
-                          </td>
+                          <td className="padding-riwayat">{ele.kasir}</td>
                         </tr>
                       );
                     })}
@@ -429,30 +528,39 @@ const Kasir = () => {
                     >
                       Rp. {formatDot(sumTotalRiwayat)}
                     </td>
-                    <td className="padding-td-kasir"></td>
                     <td
-                      className="padding-td-kasir"
-                      style={{
-                        borderBottom: "2px dashed black",
-                        borderLeft: "2px dashed black",
-                        fontWeight: "600",
-                        color: "red",
-                      }}
+                      className="padding-td-kasir kolom-selisih"
+                      style={
+                        dataFinalisasiTransaksi &&
+                        dataFinalisasiTransaksi.total > sumTotalRiwayat
+                          ? {
+                              color: "green",
+                            }
+                          : {
+                              color: "red",
+                            }
+                      }
                     >
-                      Selisih :
+                      {dataFinalisasiTransaksi &&
+                      dataFinalisasiTransaksi.total > sumTotalRiwayat
+                        ? "Lebih :"
+                        : "Kurang :"}
                     </td>
                     <td
-                      className="padding-td-kasir"
-                      style={{
-                        borderRight: "2px dashed black",
-                        borderBottom: "2px dashed black",
-                        borderLeft: "2px dashed black",
-                        fontWeight: "600",
-                        fontSize: "18px",
-                        color: "red",
-                      }}
+                      className="padding-td-kasir kolom-selisih"
+                      style={
+                        dataFinalisasiTransaksi &&
+                        dataFinalisasiTransaksi.total > sumTotalRiwayat
+                          ? {
+                              color: "green",
+                            }
+                          : {
+                              color: "red",
+                            }
+                      }
                     >
-                      Rp. {formatDot(100000)}
+                      {dataFinalisasiTransaksi &&
+                        dataFinalisasiTransaksi.total - sumTotalRiwayat}
                     </td>
                   </tr>
                 </table>
@@ -580,7 +688,7 @@ const Kasir = () => {
                       fontSize: "18px",
                       outline: "none",
                     }}
-                    value={formatDot(pecahanUang)}
+                    value={pecahanUang ? formatDot(pecahanUang) : 0}
                     type="text"
                     onChange={(e) => handleChange(e)}
                   />
