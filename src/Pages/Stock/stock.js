@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import MenuComponent from "../../Components/MenuComponent/MenuComponent";
 import PopUpComponent from "../../Components/PopUp/PopUpComponent";
 import { useStock } from "./useStock";
@@ -8,6 +8,9 @@ import BarcodeLogo from "../../Assets/barcode-icon.png";
 import DeleteIcon from "../../Assets/delete_icon.png";
 import RefreshIcon from "../../Assets/refresh-icon.png";
 import Select from "react-select";
+import { ComponentBarcodeToPrint } from "../../Components/ComponentBarcodeToPrint/ComponentBarcodeToPrint";
+import axios from "axios";
+import * as XLSX from "xlsx";
 import "./stock.css";
 
 const Stock = () => {
@@ -34,7 +37,6 @@ const Stock = () => {
     handleCloseAddNewProduk,
     popUpEditProduk,
     setPopUpEditProduk,
-
     editName,
     setEditName,
     editKode,
@@ -79,9 +81,100 @@ const Stock = () => {
     filterToko,
     setFilterToko,
     dataFilterToko,
+    printFn,
+    componentRef,
+    filterDateBelanja,
+    setFilterDateBelanja,
+    dataPrintBarcode,
   } = useStock();
 
   const [menu, setMenu] = useState("stok");
+  const [file, setFile] = useState(null);
+  const [visibleProdukCount, setVisibleProdukCount] = useState(30);
+  const [isLoadingMoreProduk, setIsLoadingMoreProduk] = useState(false);
+  const loadMoreProdukTimeoutRef = useRef(null);
+  const produkTableWrapperRef = useRef(null);
+
+  useEffect(() => {
+    setVisibleProdukCount(30);
+    setIsLoadingMoreProduk(false);
+    if (loadMoreProdukTimeoutRef.current) {
+      clearTimeout(loadMoreProdukTimeoutRef.current);
+      loadMoreProdukTimeoutRef.current = null;
+    }
+  }, [filterSearch, dataTemp?.length]);
+
+  useEffect(() => {
+    return () => {
+      if (loadMoreProdukTimeoutRef.current) {
+        clearTimeout(loadMoreProdukTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const el = produkTableWrapperRef.current;
+    if (!el) return;
+    if (!dataTemp || dataTemp.length === 0) return;
+    if (visibleProdukCount >= dataTemp.length) return;
+
+    const isScrollable = el.scrollHeight > el.clientHeight + 1;
+    if (isScrollable) return;
+
+    setVisibleProdukCount((prev) => Math.min(prev + 30, dataTemp.length));
+  }, [dataTemp?.length, visibleProdukCount]);
+
+  const data = [
+    {
+      kode: "123",
+      nama: "BUKU TULIS",
+      price: 10000,
+    },
+    {
+      kode: "123",
+      nama: "BUKU TULIS",
+      price: 10000,
+    },
+    {
+      kode: "123",
+      nama: "BUKU TULIS",
+      price: 10000,
+    },
+    {
+      kode: "123",
+      nama: "BUKU TULIS",
+      price: 10000,
+    },
+    {
+      kode: "123",
+      nama: "BUKU TULIS",
+      price: 10000,
+    },
+  ];
+
+  const handleConvert = () => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const data = e.target.result;
+        const workbook = XLSX.read(data, { type: "binary" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(worksheet);
+
+        await axios.post(
+          `${process.env.REACT_APP_ENDPOINT}/bulkUploadStock`,
+          { data: json },
+          {
+            headers: {
+              Authorization: `Bearer ${dataUser.auth}`,
+            },
+          }
+        );
+      };
+      reader.readAsBinaryString(file);
+    }
+  };
 
   return (
     <>
@@ -384,6 +477,35 @@ const Stock = () => {
         )}
         {subMenu === "stock" ? (
           <>
+            {/* <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "center",
+                margin: "12px 12px 0 0",
+              }}
+            >
+              <input
+                type="file"
+                accept=".xls,.xlsx"
+                onChange={(e) => setFile(e.target.files[0])}
+                style={{ cursor: "pointer", width: "25%", marginRight: "6px" }}
+              />
+              <button
+                style={{
+                  cursor: "pointer",
+                  padding: "12px",
+                  cursor: "pointer",
+                  background: "gold",
+                  border: "none",
+                  borderRadius: "6px",
+                  fontWeight: "bold",
+                }}
+                onClick={handleConvert}
+              >
+                IMPORT
+              </button>
+            </div> */}
             <div className="wrapper-search-bar">
               <div style={{ padding: "0 12px", width: "80%" }}>
                 <input
@@ -423,7 +545,32 @@ const Stock = () => {
                   onClick={() => setIsReload(true)}
                 />
               </div>
-              <div className="wrapper-table-kasir">
+              <div
+                className="wrapper-table-kasir"
+                ref={produkTableWrapperRef}
+                style={{ height: "70vh" }}
+                onScroll={(e) => {
+                  const el = e.currentTarget;
+                  const isScrollable = el.scrollHeight > el.clientHeight + 1;
+                  const isNearBottom =
+                    el.scrollHeight - (el.scrollTop + el.clientHeight) < 200;
+
+                  if (!isScrollable) return;
+                  if (!isNearBottom) return;
+                  if (!dataTemp || dataTemp.length === 0) return;
+                  if (visibleProdukCount >= dataTemp.length) return;
+                  if (isLoadingMoreProduk) return;
+
+                  setIsLoadingMoreProduk(true);
+                  loadMoreProdukTimeoutRef.current = setTimeout(() => {
+                    setVisibleProdukCount((prev) =>
+                      Math.min(prev + 30, dataTemp.length)
+                    );
+                    setIsLoadingMoreProduk(false);
+                    loadMoreProdukTimeoutRef.current = null;
+                  }, 120);
+                }}
+              >
                 <table
                   className="font10-mobile-bpb"
                   style={{ width: "100%", borderSpacing: 0 }}
@@ -440,9 +587,10 @@ const Stock = () => {
                     <th style={{ padding: "12px 0 12px 12px" }}></th>
                   </tr>
                   {dataTemp &&
-                    dataTemp.map((ele, index) => {
+                    dataTemp.slice(0, visibleProdukCount).map((ele, index) => {
                       return (
                         <tr
+                          key={ele?.id ?? ele?.kode ?? index}
                           style={
                             index % 2 === 0
                               ? { background: "white" }
@@ -500,12 +648,42 @@ const Stock = () => {
                         </tr>
                       );
                     })}
+                  {dataTemp && dataTemp.length > visibleProdukCount && (
+                    <tr>
+                      <td
+                        colSpan={9}
+                        style={{
+                          padding: "12px",
+                          textAlign: "center",
+                          color: "#666",
+                        }}
+                      >
+                        {isLoadingMoreProduk
+                          ? "Loading..."
+                          : "Scroll untuk load lebih banyak"}
+                      </td>
+                    </tr>
+                  )}
                 </table>
               </div>
             </div>
           </>
         ) : (
           <>
+            <button onClick={() => printFn()}>Print</button>
+            {/* <div
+            style={{
+              visibility: "hidden",
+              top: "-9999px",
+              position: "absolute",
+            }}
+            > */}
+            <ComponentBarcodeToPrint
+              ref={componentRef}
+              data={data}
+              // data={dataPrintBarcode && dataPrintBarcode}
+            />
+            {/* </div> */}
             <div
               style={{
                 display: "flex",
@@ -734,6 +912,8 @@ const Stock = () => {
               <div>
                 <input
                   type="date"
+                  value={filterDateBelanja}
+                  onChange={(e) => setFilterDateBelanja(e.target.value)}
                   style={{ margin: "24px 12px 12px 12px", height: "24px" }}
                 />
                 <select
@@ -759,11 +939,22 @@ const Stock = () => {
                   Reset
                 </button>
               </div>
-              <img
-                src={RefreshIcon}
-                className="refresh-button"
-                onClick={() => setIsReloadBelanja(true)}
-              />
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <img
+                  src={BarcodeLogo}
+                  onClick={() => printFn()}
+                  style={{
+                    width: "32px",
+                    cursor: "pointer",
+                    marginRight: "24px",
+                  }}
+                />
+                <img
+                  src={RefreshIcon}
+                  className="refresh-button"
+                  onClick={() => setIsReloadBelanja(true)}
+                />
+              </div>
             </div>
 
             <div className="wrapper-table-kasir">
@@ -819,12 +1010,7 @@ const Stock = () => {
                         <td style={{ padding: "12px 0px 12px 12px" }}>
                           {ele.kasir}
                         </td>
-                        <td style={{ padding: "12px 0px 12px 12px" }}>
-                          <img
-                            src={BarcodeLogo}
-                            style={{ width: "24px", cursor: "pointer" }}
-                          />
-                        </td>
+                        <td style={{ padding: "12px 0px 12px 12px" }}></td>
                       </tr>
                     );
                   })}

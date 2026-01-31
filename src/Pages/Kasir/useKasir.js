@@ -32,38 +32,16 @@ export const useKasir = () => {
 
   const [result, setResult] = useState("");
 
-  useEffect(() => {
-    document.addEventListener("keydown", detectKeyDown, true);
-  }, []);
+  const [lastOrder, setLastOrder] = useState();
+
+  const [filterKasir, setFilterKasir] = useState();
+  const [dataFinalisasiTransaksi, setDataFinalisasiTransaksi] = useState();
   const componentRef = useRef(null);
 
-  const handleAfterPrint = useCallback(() => {
-    console.log("`onAfterPrint` called");
-  }, []);
+  const handleChange = (e) => {
+    const replace = e.target.value.replace(/[^0-9]/g, "");
 
-  const handleBeforePrint = useCallback(() => {
-    console.log("`onBeforePrint` called");
-    return Promise.resolve();
-  }, []);
-
-  const printFn = useReactToPrint({
-    contentRef: componentRef,
-    documentTitle: "",
-    onAfterPrint: handleAfterPrint,
-    onBeforePrint: handleBeforePrint,
-  });
-  const detectKeyDown = (e) => {
-    if (e.key === "F2") {
-      printFn();
-    }
-    if (e.key === "F4") {
-      e.preventDefault();
-      setTimeout(() => {
-        const input = document.getElementById("myInput");
-        input.focus();
-        input.select();
-      }, 10); // delay 10ms
-    }
+    setPecahanUang(Number(replace));
   };
 
   useEffect(() => {
@@ -75,6 +53,14 @@ export const useKasir = () => {
         setListStok,
         ""
       );
+
+      postAxios(
+        `${process.env.REACT_APP_ENDPOINT}/getLastOrder`,
+        { id: dataUser.id },
+        dataUser.auth,
+        setLastOrder,
+        ""
+      );
       setIsReload(false);
     } else if (subMenu === "Riwayat" && dataUser.role === "god_mode") {
       postAxios(
@@ -84,9 +70,16 @@ export const useKasir = () => {
         setListRiwayat,
         ""
       );
+      postAxios(
+        `${process.env.REACT_APP_ENDPOINT}/getFinalisasiTransaksi`,
+        { id: filterKasir, filterDate: filterDateRiwayat },
+        dataUser.auth,
+        setDataFinalisasiTransaksi,
+        ""
+      );
       setIsReload(false);
     }
-  }, [isReload, subMenu, filterDateRiwayat]);
+  }, [isReload, subMenu, filterDateRiwayat, filterKasir]);
 
   const handleTambahItem = (data) => {
     let obj = [...keranjang];
@@ -155,11 +148,13 @@ export const useKasir = () => {
       let searchName = [];
       listStok &&
         listStok.forEach((value) => {
-          if (value.name.toLowerCase().includes(filterSearch.toLowerCase())) {
-            searchName.push(value);
-          } else if (
-            value.kode.toLowerCase().includes(filterSearch.toLowerCase())
-          ) {
+          if (!value || !value.name) return;
+          const nameMatches = value.name
+            .toLowerCase()
+            .includes(filterSearch.toLowerCase());
+          const codeMatches = value.kode && 
+            String(value.kode).toLowerCase().includes(filterSearch.toLowerCase());
+          if (nameMatches || codeMatches) {
             searchName.push(value);
           }
         });
@@ -181,27 +176,70 @@ export const useKasir = () => {
 
   const handleResetKasir = () => {
     setIsDisabled(false);
+    setKeranjang([]);
+    setPecahanUang();
   };
+
+  const handleAfterPrint = useCallback(() => {
+    console.log("`onAfterPrint` called");
+  }, []);
+
+  const handleBeforePrint = useCallback(() => {
+    console.log("`onBeforePrint` called");
+    return Promise.resolve();
+  }, []);
+
+  const printFn = useReactToPrint({
+    contentRef: componentRef,
+    documentTitle: "",
+    onAfterPrint: handleAfterPrint,
+    onBeforePrint: handleBeforePrint,
+  });
 
   const handleBayarPrint = () => {
     if (keranjang.length > 0 && pecahanUang) {
-      // postAxios(
-      //   `${process.env.REACT_APP_ENDPOINT}/addNewTransaction`,
-      //   {
-      //     data: keranjang,
-      //     pecahanUang: pecahanUang,
-      //     kasir: dataUser.name,
-      //   },
-      //   dataUser.auth,
-      //   "",
-      //   ""
-      // );
+      postAxios(
+        `${process.env.REACT_APP_ENDPOINT}/addNewTransaction`,
+        {
+          data: keranjang,
+          pecahanUang: pecahanUang,
+          kasir: dataUser.name,
+        },
+        dataUser.auth,
+        "",
+        ""
+      );
+      printFn();
       handleResetKasir();
       setPopUpBayar(true);
       setIsReload(true);
-      printFn();
     }
   };
+
+  const detectKeyDown = useCallback(
+    (e) => {
+      if (e.key === "F2" && pecahanUang > 0) {
+        e.preventDefault();
+        handleBayarPrint();
+      }
+      if (e.key === "F4") {
+        e.preventDefault();
+        setTimeout(() => {
+          const input = document.getElementById("myInput");
+          input.focus();
+          input.select();
+        }, 10); // delay 10ms
+      }
+    },
+    [pecahanUang, handleBayarPrint]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", detectKeyDown, true);
+    return () => {
+      document.removeEventListener("keydown", detectKeyDown, true);
+    };
+  }, [detectKeyDown]);
 
   const handleCancelFinalisasi = () => {
     setIsDisabledFinalisasi(false);
@@ -228,17 +266,21 @@ export const useKasir = () => {
     }
   };
 
-  const handleChange = (e) => {
-    const replace = e.target.value.replace(/[^0-9]/g, "");
-
-    setPecahanUang(Number(replace));
-  };
-
   const handleChangeFinalisasi = (e) => {
     const replace = e.target.value.replace(/[^0-9]/g, "");
 
     setFinalisasi(Number(replace));
   };
+
+  const uniqueIds = [
+    ...new Set(listRiwayat && listRiwayat.map((item) => item.id)),
+  ];
+
+  const uniqueArray =
+    uniqueIds &&
+    uniqueIds.map((id) => {
+      return listRiwayat && listRiwayat.find((item) => item.id === id);
+    });
 
   return {
     dataUser,
@@ -280,5 +322,11 @@ export const useKasir = () => {
     setResult,
     listStok,
     setKeranjang,
+    lastOrder,
+    printFn,
+    uniqueArray,
+    filterKasir,
+    setFilterKasir,
+    dataFinalisasiTransaksi,
   };
 };

@@ -48,10 +48,17 @@ const MenuComponent = ({ setMenu, menu }) => {
           />
           <img
             className={
-              menu === "budget" ? "img-menu-mobile-active" : "img-menu-mobile"
+              menu === "stok" ? "img-menu-mobile-active" : "img-menu-mobile"
             }
-            onClick={() => pickMenu("budget", "/budget")}
-            src={BudgetIcon}
+            onClick={() => pickMenu("stok", "/stok")}
+            src={InventoryIcon}
+          />
+          <img
+            className={
+              menu === "user" ? "img-menu-mobile-active" : "img-menu-mobile"
+            }
+            onClick={() => pickMenu("user", "/user")}
+            src={UserIcon}
           />
 
           <img

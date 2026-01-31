@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { postAxios } from "../../util/apiCall";
+import { useReactToPrint } from "react-to-print";
+import { formatDate } from "../../util/helperFunction";
 
 export const useStock = () => {
   const dataAuth = localStorage.getItem("auth");
@@ -47,6 +49,11 @@ export const useStock = () => {
 
   const [listBelanja, setListBelanja] = useState();
   const [filterToko, setFilterToko] = useState("Pilih Toko");
+  const [filterDateBelanja, setFilterDateBelanja] = useState(formatDate);
+
+  const [errMsgBelanja, setErrMsgBelanja] = useState("");
+
+  const componentRef = useRef(null);
 
   useEffect(() => {
     if (subMenu === "stock") {
@@ -65,14 +72,14 @@ export const useStock = () => {
     if (subMenu === "belanja") {
       postAxios(
         `${process.env.REACT_APP_ENDPOINT}/getListBelanja`,
-        {},
+        { filterDate: filterDateBelanja },
         dataUser.auth,
         setListBelanja,
         ""
       );
       setIsReloadBelanja(false);
     }
-  }, [isReloadBelanja, subMenu]);
+  }, [isReloadBelanja, subMenu, filterDateBelanja]);
 
   const handleCloseAddNewProduk = () => {
     setToko("Tenar");
@@ -242,15 +249,17 @@ export const useStock = () => {
           },
           dataUser.auth,
           "",
-          ""
+          setErrMsgBelanja
         );
-        setIsReloadBelanja(true);
-        setNamaBarangTemp();
-        setKodeTemp();
-        setHargaTemp();
-        setJumlahTemp();
-        setIsDisabledBelanja(false);
-        setErrBelanja(false);
+        if (!errMsgBelanja) {
+          setIsReloadBelanja(true);
+          setNamaBarangTemp();
+          setKodeTemp();
+          setHargaTemp();
+          setJumlahTemp();
+          setIsDisabledBelanja(false);
+          setErrBelanja(false);
+        }
       } else {
         setErrBelanja(true);
         setIsDisabledBelanja(false);
@@ -274,6 +283,41 @@ export const useStock = () => {
   };
 
   let dataFilterToko = handleFilterToko();
+
+  const handleAfterPrint = useCallback(() => {
+    console.log("`onAfterPrint` called");
+  }, []);
+
+  const handleBeforePrint = useCallback(() => {
+    console.log("`onBeforePrint` called");
+    return Promise.resolve();
+  }, []);
+
+  const printFn = useReactToPrint({
+    contentRef: componentRef,
+    documentTitle: "",
+    onAfterPrint: handleAfterPrint,
+    onBeforePrint: handleBeforePrint,
+  });
+
+  let dataPrintBarcode = [];
+
+  dataFilterToko &&
+    dataFilterToko.forEach((ele) => {
+      for (let index = 0; index < ele.qty; index++) {
+        console.log(ele);
+        dataPrintBarcode.push(ele);
+      }
+      dataPrintBarcode.push({
+        id: "",
+        kode: "",
+        name: "",
+        price: 0,
+        qty: 0,
+        timeStamp: "",
+        toko: "",
+      });
+    });
 
   return {
     dataUser,
@@ -340,5 +384,10 @@ export const useStock = () => {
     filterToko,
     setFilterToko,
     dataFilterToko,
+    printFn,
+    componentRef,
+    filterDateBelanja,
+    setFilterDateBelanja,
+    dataPrintBarcode,
   };
 };

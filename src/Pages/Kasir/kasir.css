@@ -1,6 +1,11 @@
 .container_kasir {
   margin: 0px 6px 0px 137px;
 }
+.wrapper-kasir {
+  width: 75%;
+  height: 100vh;
+  background: #fafafa;
+}
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -138,4 +143,30 @@ input::-webkit-inner-spin-button {
   height: 32px;
   margin-right: 12px;
   cursor: pointer;
+}
+.kolom-selisih {
+  border-right: 2px dashed black;
+  border-bottom: 2px dashed black;
+  border-left: 2px dashed black;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.padding-riwayat {
+  padding: 12px 0px 12px 12px;
+}
+
+@media only screen and (max-width: 600px) {
+  .wrapper-mini-bar {
+    display: none;
+  }
+  .container_kasir {
+    margin: 0;
+  }
+  .wrapper-kasir {
+    width: 100%;
+  }
+  .padding-riwayat {
+    padding: 6px 0px 6px 6px;
+  }
 }
