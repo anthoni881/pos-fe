@@ -32,15 +32,16 @@ export const ComponentBarcodeToPrint = forwardRef((props, ref) => {
   return (
     <>
       <style type="text/css" media="print">
-        {`@page { size: 95mm 50mm portrait;`}
+        {`@page { size: 108mm 50mm portrait;`}
       </style>
       <div ref={ref} className="relativeCSS" id="testClass">
         <div
           style={{
-            width: "95mm",
+            width: "108mm",
             padding: "4px",
             display: "flex",
             flexWrap: "wrap",
+            justifyContent: "space-between",
           }}
         >
           {data &&
@@ -49,11 +50,11 @@ export const ComponentBarcodeToPrint = forwardRef((props, ref) => {
                 <div
                   style={{
                     marginRight: "1mm",
-                    width: "30mm",
+                    width: "35mm",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    marginBottom: "12px",
+                    marginBottom: "6px",
                   }}
                 >
                   {ele.name || ele.nama ? (
@@ -65,7 +66,6 @@ export const ComponentBarcodeToPrint = forwardRef((props, ref) => {
                       text={ele.kode}
                       fontSize="9px"
                       margin={0}
-                      marginTop={5}
                       renderer="svg"
                       ean128={true}
                     />
