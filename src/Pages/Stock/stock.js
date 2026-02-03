@@ -126,29 +126,29 @@ const Stock = () => {
 
   const data = [
     {
-      kode: "123",
+      kode: "10227",
       nama: "BUKU TULIS",
       price: 10000,
     },
     {
-      kode: "123",
+      kode: "10227",
       nama: "BUKU TULIS",
       price: 10000,
     },
     {
-      kode: "123",
+      kode: "30032",
       nama: "BUKU TULIS",
-      price: 10000,
+      price: 30000,
     },
     {
-      kode: "123",
+      kode: "30032",
       nama: "BUKU TULIS",
-      price: 10000,
+      price: 30000,
     },
     {
-      kode: "123",
+      kode: "	30083",
       nama: "BUKU TULIS",
-      price: 10000,
+      price: 30000,
     },
   ];
 
