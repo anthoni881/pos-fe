@@ -12,6 +12,8 @@ import "./MenuComponent.css";
 
 const MenuComponent = ({ setMenu, menu }) => {
   const navigate = useNavigate();
+  const dataAuth = localStorage.getItem("auth");
+  const dataUser = JSON.parse(dataAuth);
 
   const [code, setCode] = useState();
 
@@ -46,30 +48,36 @@ const MenuComponent = ({ setMenu, menu }) => {
             }
             onClick={() => pickMenu("kasir", "/kasir")}
           />
-          <img
-            className={
-              menu === "stok" ? "img-menu-mobile-active" : "img-menu-mobile"
-            }
-            onClick={() => pickMenu("stok", "/stok")}
-            src={InventoryIcon}
-          />
-          <img
-            className={
-              menu === "user" ? "img-menu-mobile-active" : "img-menu-mobile"
-            }
-            onClick={() => pickMenu("user", "/user")}
-            src={UserIcon}
-          />
+          {dataUser.role === "god_mode" ? (
+            <>
+              <img
+                className={
+                  menu === "stok" ? "img-menu-mobile-active" : "img-menu-mobile"
+                }
+                onClick={() => pickMenu("stok", "/stok")}
+                src={InventoryIcon}
+              />
+              <img
+                className={
+                  menu === "user" ? "img-menu-mobile-active" : "img-menu-mobile"
+                }
+                onClick={() => pickMenu("user", "/user")}
+                src={UserIcon}
+              />
 
-          <img
-            style={{
-              width: "24px",
-              height: "24px",
-              margin: "12px 12px 12px 36px",
-            }}
-            src={LogoutIcon}
-            onClick={() => handleLogout()}
-          />
+              <img
+                style={{
+                  width: "24px",
+                  height: "24px",
+                  margin: "12px 12px 12px 36px",
+                }}
+                src={LogoutIcon}
+                onClick={() => handleLogout()}
+              />
+            </>
+          ) : (
+            ""
+          )}
         </div>
       </div>
       <div
@@ -108,44 +116,54 @@ const MenuComponent = ({ setMenu, menu }) => {
               <p className={menu === "kasir" ? "menu-active" : "menu"}>Kasir</p>
             </div>
           </div>
-          <div
-            className="wrapper-menu-component"
-            onClick={() => pickMenu("stok", "/stok")}
-          >
-            <label
-              className={menu === "stok" ? "menu-marker" : "display-none-menu"}
-            >
-              a
-            </label>
-            <img
-              className={
-                menu === "stok"
-                  ? "img-menu-component img-menu-active"
-                  : "img-menu-component"
-              }
-              src={InventoryIcon}
-            />
-            <p className={menu === "stok" ? "menu-active" : "menu"}>Stok</p>
-          </div>
-          <div
-            className="wrapper-menu-component"
-            onClick={() => pickMenu("user", "/user")}
-          >
-            <label
-              className={menu === "user" ? "menu-marker" : "display-none-menu"}
-            >
-              a
-            </label>
-            <img
-              className={
-                menu === "user"
-                  ? "img-menu-component img-menu-active"
-                  : "img-menu-component"
-              }
-              src={UserIcon}
-            />
-            <p className={menu === "user" ? "menu-active" : "menu"}>User</p>
-          </div>
+          {dataUser.role === "god_mode" ? (
+            <>
+              <div
+                className="wrapper-menu-component"
+                onClick={() => pickMenu("stok", "/stok")}
+              >
+                <label
+                  className={
+                    menu === "stok" ? "menu-marker" : "display-none-menu"
+                  }
+                >
+                  a
+                </label>
+                <img
+                  className={
+                    menu === "stok"
+                      ? "img-menu-component img-menu-active"
+                      : "img-menu-component"
+                  }
+                  src={InventoryIcon}
+                />
+                <p className={menu === "stok" ? "menu-active" : "menu"}>Stok</p>
+              </div>
+              <div
+                className="wrapper-menu-component"
+                onClick={() => pickMenu("user", "/user")}
+              >
+                <label
+                  className={
+                    menu === "user" ? "menu-marker" : "display-none-menu"
+                  }
+                >
+                  a
+                </label>
+                <img
+                  className={
+                    menu === "user"
+                      ? "img-menu-component img-menu-active"
+                      : "img-menu-component"
+                  }
+                  src={UserIcon}
+                />
+                <p className={menu === "user" ? "menu-active" : "menu"}>User</p>
+              </div>
+            </>
+          ) : (
+            ""
+          )}
 
           <br />
           <br />
