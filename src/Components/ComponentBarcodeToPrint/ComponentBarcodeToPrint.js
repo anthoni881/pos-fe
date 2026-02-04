@@ -32,12 +32,12 @@ export const ComponentBarcodeToPrint = forwardRef((props, ref) => {
   return (
     <>
       <style type="text/css" media="print">
-        {`@page { size: 108mm 50mm portrait;`}
+        {`@page { size: 114mm 50mm portrait;`}
       </style>
       <div ref={ref} className="relativeCSS" id="testClass">
         <div
           style={{
-            width: "108mm",
+            width: "114mm",
             padding: "4px",
             display: "flex",
             flexWrap: "wrap",
@@ -49,7 +49,7 @@ export const ComponentBarcodeToPrint = forwardRef((props, ref) => {
               return (
                 <div
                   style={{
-                    marginRight: "1mm",
+                    margin: "2mm 0 1mm 3mm",
                     width: "35mm",
                     display: "flex",
                     flexDirection: "column",
