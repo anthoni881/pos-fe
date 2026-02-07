@@ -65,7 +65,11 @@ export const useKasir = () => {
     } else if (subMenu === "Riwayat" && dataUser.role === "god_mode") {
       postAxios(
         `${process.env.REACT_APP_ENDPOINT}/getHistoryKasir`,
-        { filterDate: filterDateRiwayat, role: dataUser.role, id: dataUser.id },
+        {
+          filterDate: filterDateRiwayat,
+          role: dataUser.role,
+          id: dataUser.id,
+        },
         dataUser.auth,
         setListRiwayat,
         ""
@@ -84,12 +88,11 @@ export const useKasir = () => {
   const handleTambahItem = (data) => {
     let obj = [...keranjang];
 
-    const findIndex = obj && obj.findIndex((obj) => obj.id === data.id);
-    const foundObject = obj && obj.find((obj) => obj.id === data.id);
+    const findIndex = obj && obj.findIndex((obj) => obj.kode === data.kode);
+    const foundObject = obj && obj.find((obj) => obj.kode === data.kode);
 
     if (findIndex === -1) {
       obj.push({
-        id: data.id,
         userId: dataUser.id,
         isFinal: false,
         name: data.name,
@@ -109,8 +112,8 @@ export const useKasir = () => {
   const handleIncreaseItem = (data) => {
     let obj = [...keranjang];
 
-    const findIndex = obj && obj.findIndex((obj) => obj.id === data.id);
-    const foundObject = obj && obj.find((obj) => obj.id === data.id);
+    const findIndex = obj && obj.findIndex((obj) => obj.kode === data.kode);
+    const foundObject = obj && obj.find((obj) => obj.kode === data.kode);
     let calculate = foundObject.qty + 1;
 
     obj[findIndex][`qty`] = calculate;
@@ -121,8 +124,8 @@ export const useKasir = () => {
   const handleDecreaseItem = (data) => {
     let obj = [...keranjang];
 
-    const findIndex = obj && obj.findIndex((obj) => obj.id === data.id);
-    const foundObject = obj && obj.find((obj) => obj.id === data.id);
+    const findIndex = obj && obj.findIndex((obj) => obj.kode === data.kode);
+    const foundObject = obj && obj.find((obj) => obj.kode === data.kode);
     let calculate = foundObject.qty - 1;
 
     if (calculate > 0) {
@@ -135,7 +138,7 @@ export const useKasir = () => {
     let data = [...keranjang];
     data.splice(
       data.findIndex(function (i) {
-        return i.id === id;
+        return i.kode === id;
       }),
       1
     );
@@ -152,8 +155,11 @@ export const useKasir = () => {
           const nameMatches = value.name
             .toLowerCase()
             .includes(filterSearch.toLowerCase());
-          const codeMatches = value.kode && 
-            String(value.kode).toLowerCase().includes(filterSearch.toLowerCase());
+          const codeMatches =
+            value.kode &&
+            String(value.kode)
+              .toLowerCase()
+              .includes(filterSearch.toLowerCase());
           if (nameMatches || codeMatches) {
             searchName.push(value);
           }
@@ -282,6 +288,23 @@ export const useKasir = () => {
       return listRiwayat && listRiwayat.find((item) => item.id === id);
     });
 
+  const searchFeatureKasir = () => {
+    if (filterKasir) {
+      let searchName = [];
+      listRiwayat &&
+        listRiwayat.forEach((value) => {
+          if (value.id === filterKasir) {
+            searchName.push(value);
+          }
+        });
+      return searchName;
+    } else {
+      return listRiwayat && listRiwayat;
+    }
+  };
+
+  let dataTempRiwayatKasir = searchFeatureKasir();
+
   return {
     dataUser,
     handleTambahItem,
@@ -328,5 +351,6 @@ export const useKasir = () => {
     filterKasir,
     setFilterKasir,
     dataFinalisasiTransaksi,
+    dataTempRiwayatKasir,
   };
 };

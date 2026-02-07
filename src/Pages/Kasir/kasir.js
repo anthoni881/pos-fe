@@ -59,6 +59,7 @@ const Kasir = () => {
     filterKasir,
     setFilterKasir,
     dataFinalisasiTransaksi,
+    dataTempRiwayatKasir,
   } = useKasir();
 
   const [menu, setMenu] = useState("kasir");
@@ -109,6 +110,12 @@ const Kasir = () => {
     const foundObject = obj && obj.find((obj) => obj.kode === result);
 
     const data = listStok && listStok.find((obj) => obj.kode === result);
+    console.log({
+      data: data,
+      result: result,
+      foundObject: foundObject,
+      obj: obj,
+    });
 
     if (result !== "") {
       if (findIndex === -1) {
@@ -148,8 +155,8 @@ const Kasir = () => {
     }, 0);
 
   const sumTotalRiwayat =
-    listRiwayat &&
-    listRiwayat.reduce(function (s, a) {
+    dataTempRiwayatKasir &&
+    dataTempRiwayatKasir.reduce(function (s, a) {
       let sumPrice = a.qty * a.price;
       return s + sumPrice;
     }, 0);
@@ -464,8 +471,8 @@ const Kasir = () => {
                     <th style={{ padding: "12px 0 12px 12px" }}>Jam</th>
                     <th style={{ padding: "12px 0 12px 12px" }}>Kasir</th>
                   </tr>
-                  {listRiwayat &&
-                    listRiwayat.map((ele, index) => {
+                  {dataTempRiwayatKasir &&
+                    dataTempRiwayatKasir.map((ele, index) => {
                       return (
                         <tr
                           style={
@@ -559,8 +566,10 @@ const Kasir = () => {
                             }
                       }
                     >
-                      {dataFinalisasiTransaksi &&
-                        dataFinalisasiTransaksi.total - sumTotalRiwayat}
+                      {formatDot(
+                        dataFinalisasiTransaksi &&
+                          dataFinalisasiTransaksi.total - sumTotalRiwayat
+                      )}
                     </td>
                   </tr>
                 </table>
@@ -617,7 +626,7 @@ const Kasir = () => {
                             height: "20px",
                             cursor: "pointer",
                           }}
-                          onClick={() => handleDeleteProdukPick(obj.id)}
+                          onClick={() => handleDeleteProdukPick(obj.kode)}
                         />
                       </div>
                       <div className="flex-justify-between-align-center">
