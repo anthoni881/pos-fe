@@ -185,14 +185,14 @@ export const useStock = () => {
     postAxios(
       `${process.env.REACT_APP_ENDPOINT}/deleteStock`,
       {
-        id: pickDelete.id,
+        kode: pickDelete.kode,
+        name: pickDelete.name,
       },
       dataUser.auth,
       "",
       ""
     );
     setIsReload(true);
-
     setPopUpDelete(false);
     setPickDelete();
   };
