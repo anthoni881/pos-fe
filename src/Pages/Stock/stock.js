@@ -944,8 +944,8 @@ const Stock = () => {
                   <option selected disabled>
                     Pilih Toko
                   </option>
-                  <option value="TigaHarga">Tiga Harga</option>
-                  <option value="Tenar">Tenar</option>
+                  <option value="TIGA HARGA">Tiga Harga</option>
+                  <option value="TENAR">Tenar</option>
                 </select>
                 <button
                   className="reset-button"

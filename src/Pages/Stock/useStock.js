@@ -305,7 +305,6 @@ export const useStock = () => {
   dataFilterToko &&
     dataFilterToko.forEach((ele) => {
       for (let index = 0; index < ele.qty; index++) {
-        console.log(ele);
         dataPrintBarcode.push(ele);
       }
       dataPrintBarcode.push({
