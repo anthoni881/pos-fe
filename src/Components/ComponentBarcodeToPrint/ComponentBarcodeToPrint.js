@@ -37,7 +37,7 @@ export const ComponentBarcodeToPrint = forwardRef((props, ref) => {
       <div ref={ref} className="relativeCSS" id="testClass">
         <div
           style={{
-            width: "114mm",
+            width: "124mm",
             padding: "4px",
             display: "flex",
             flexWrap: "wrap",
@@ -49,7 +49,7 @@ export const ComponentBarcodeToPrint = forwardRef((props, ref) => {
               return (
                 <div
                   style={{
-                    margin: "2mm 0 1mm 3mm",
+                    margin: "2mm 0 12px 3mm",
                     width: "35mm",
                     display: "flex",
                     flexDirection: "column",
