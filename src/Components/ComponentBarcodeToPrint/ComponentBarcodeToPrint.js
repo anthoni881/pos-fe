@@ -49,12 +49,11 @@ export const ComponentBarcodeToPrint = forwardRef((props, ref) => {
               return (
                 <div
                   style={{
-                    margin: "2mm 0 16px 3mm",
+                    margin: "2mm 0mm 16px 3mm",
                     width: "35mm",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    marginBottom: "6px",
                   }}
                 >
                   {ele.name || ele.nama ? (
