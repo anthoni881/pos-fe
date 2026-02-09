@@ -15,6 +15,7 @@ const Login = () => {
     setPopUpLogin,
     errMsg,
   } = useLogin();
+  console.log("hola");
   return (
     <div className="container_login" style={{ flexDirection: "column" }}>
       {popUpLogin ? (
