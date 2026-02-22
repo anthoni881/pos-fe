@@ -110,12 +110,6 @@ const Kasir = () => {
     const foundObject = obj && obj.find((obj) => obj.kode === result);
 
     const data = listStok && listStok.find((obj) => obj.kode === result);
-    console.log({
-      data: data,
-      result: result,
-      foundObject: foundObject,
-      obj: obj,
-    });
 
     if (result !== "") {
       if (findIndex === -1) {
@@ -162,6 +156,7 @@ const Kasir = () => {
     }, 0);
 
   const handleKeyDown = (e) => {
+    e.preventDefault();
     if (e.key === "Enter") {
       if (bufferRef.current) {
         setResult(bufferRef.current);
@@ -715,43 +710,6 @@ const Kasir = () => {
                 </label>
               </div>
 
-              {/* <div className="wrapper-radio">
-                <div
-                  className="radio-jenis-pembayaran"
-                  style={{ marginRight: "24px" }}
-                  onClick={() => setJenisPembayaran("Tunai")}
-                >
-                  <input
-                    type="radio"
-                    style={{ cursor: "pointer" }}
-                    checked={jenisPembayaran === "Tunai"}
-                  />
-                  <label style={{ cursor: "pointer" }}>Tunai</label>
-                </div>
-                <div
-                  className="radio-jenis-pembayaran"
-                  style={{ marginRight: "24px" }}
-                  onClick={() => setJenisPembayaran("Transfer")}
-                >
-                  <input
-                    type="radio"
-                    style={{ cursor: "pointer" }}
-                    checked={jenisPembayaran === "Transfer"}
-                  />
-                  <label style={{ cursor: "pointer" }}>Transfer</label>
-                </div>
-                <div
-                  className="radio-jenis-pembayaran"
-                  onClick={() => setJenisPembayaran("QRIS")}
-                >
-                  <input
-                    type="radio"
-                    style={{ cursor: "pointer" }}
-                    checked={jenisPembayaran === "QRIS"}
-                  />
-                  <label style={{ cursor: "pointer" }}>QRIS</label>
-                </div>
-              </div> */}
               <div className="wrapper-button-bayar">
                 <button
                   className="button-bayar"

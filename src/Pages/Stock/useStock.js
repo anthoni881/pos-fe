@@ -53,6 +53,8 @@ export const useStock = () => {
 
   const [errMsgBelanja, setErrMsgBelanja] = useState("");
 
+  const [dataBarcodePrint, setDataBarcodePrint] = useState();
+
   const componentRef = useRef(null);
 
   useEffect(() => {
@@ -388,5 +390,7 @@ export const useStock = () => {
     filterDateBelanja,
     setFilterDateBelanja,
     dataPrintBarcode,
+    dataBarcodePrint,
+    setDataBarcodePrint,
   };
 };

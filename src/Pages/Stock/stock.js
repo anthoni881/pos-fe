@@ -86,6 +86,8 @@ const Stock = () => {
     filterDateBelanja,
     setFilterDateBelanja,
     dataPrintBarcode,
+    dataBarcodePrint,
+    setDataBarcodePrint,
   } = useStock();
 
   const [menu, setMenu] = useState("stok");
@@ -190,6 +192,16 @@ const Stock = () => {
       reader.readAsBinaryString(file);
     }
   };
+
+  let dataBarcode = [];
+
+  for (let i = 0; i < 6; i++) {
+    dataBarcode.push({
+      kode: dataBarcodePrint && dataBarcodePrint.kode,
+      nama: dataBarcodePrint && dataBarcodePrint.name,
+      price: dataBarcodePrint && dataBarcodePrint.price,
+    });
+  }
 
   return (
     <>
@@ -492,6 +504,18 @@ const Stock = () => {
         )}
         {subMenu === "stock" ? (
           <>
+            <div
+              style={{
+                visibility: "hidden",
+                top: "-9999px",
+                position: "absolute",
+              }}
+            >
+              <ComponentBarcodeToPrint
+                ref={componentRef}
+                data={dataBarcode && dataBarcode}
+              />
+            </div>
             {/* <div
               style={{
                 display: "flex",
@@ -645,6 +669,10 @@ const Stock = () => {
                             <img
                               src={BarcodeLogo}
                               style={{ width: "24px", cursor: "pointer" }}
+                              onClick={() => {
+                                setDataBarcodePrint(ele);
+                                printFn();
+                              }}
                             />
                           </td>
                           <td style={{ padding: "12px 0px 12px 12px" }}>
