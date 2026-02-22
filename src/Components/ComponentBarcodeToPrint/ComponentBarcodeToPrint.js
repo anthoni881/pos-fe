@@ -49,7 +49,7 @@ export const ComponentBarcodeToPrint = forwardRef((props, ref) => {
               return (
                 <div
                   style={{
-                    margin: "2mm 0mm 16px 3mm",
+                    margin: "0mm 0mm 5mm 3mm",
                     width: "35mm",
                     display: "flex",
                     flexDirection: "column",
@@ -66,15 +66,17 @@ export const ComponentBarcodeToPrint = forwardRef((props, ref) => {
                       fontSize="9px"
                       margin={0}
                       renderer="svg"
+                      textMargin={0}
                       ean128={true}
                     />
                   ) : (
                     ""
                   )}
+                  <label style={{ fontSize: "10px" }}>{ele.nama}</label>
                   <p
                     style={{
-                      margin: "2px 0 4px 0",
-                      fontSize: "10px",
+                      margin: "0px 0 4px 0",
+                      fontSize: "12px",
                       textAlign: "center",
                     }}
                   >
